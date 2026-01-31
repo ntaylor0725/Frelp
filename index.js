@@ -1,5 +1,16 @@
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyD7LL82P_0_bOV93-ri3hCmVfRpmm-LBGo",
+  authDomain: "frenchhelper-dbc41.firebaseapp.com",
+  databaseURL: "https://frenchhelper-dbc41-default-rtdb.firebaseio.com/",
+  projectId: "frenchhelper-dbc41",
+  storageBucket: "frenchhelper-dbc41.appspot.com",
+  messagingSenderId: "767005077858",
+  appId: "1:767005077858:web:8e64ee6c4a57774b54fc3b"
+};
+
 // Initialize Firebase
-firebase.initializeApp(env.firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 
 var user;
 var databaseUsers = firebase.database().ref("users");
