@@ -1,16 +1,5 @@
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyD7LL82P_0_bOV93-ri3hCmVfRpmm-LBGo",
-  authDomain: "frenchhelper-dbc41.firebaseapp.com",
-  databaseURL: "https://frenchhelper-dbc41-default-rtdb.firebaseio.com/",
-  projectId: "frenchhelper-dbc41",
-  storageBucket: "frenchhelper-dbc41.appspot.com",
-  messagingSenderId: "767005077858",
-  appId: "1:767005077858:web:8e64ee6c4a57774b54fc3b"
-};
-
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(env.firebaseConfig);
 
 var user;
 var databaseUsers = firebase.database().ref("users");
@@ -33,39 +22,38 @@ firebase.auth().onAuthStateChanged((currentUser) => {
 
 function createAccount(email, password, username) {
   firebase.auth().createUserWithEmailAndPassword(email, password)
-  .then((userCredential) => {
-    // Signed in 
-    user = userCredential.user;
-    user.updateProfile({
-      displayName: username.toString().trim()
+    .then((userCredential) => {
+      // Signed in 
+      user = userCredential.user;
+      user.updateProfile({
+        displayName: username.toString().trim()
+      })
+      signIn(email, password, "home");
+      databaseUsers.child(user.uid).set({
+        "username": username.toString().trim(),
+        "sets": [],
+        "canCreateSets": false
+      });
     })
-    signIn(email, password, "home");
-    databaseUsers.child(user.uid).set({
-      "username": username.toString().trim(),
-      "sets": [],
-      "canCreateSets": false
+    .catch((error) => {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      accountError(errorCode, errorMessage);
     });
-  })
-  .catch((error) => {
-    var errorCode = error.code;
-    var errorMessage = error.message;
-    accountError(errorCode, errorMessage);
-  });
 }
 
 function signIn(email, password, nextPage) {
   firebase.auth().signInWithEmailAndPassword(email, password)
-  .then((userCredential) => 
-  {
-    // Signed in
-    user = userCredential.user;
-    switchPageTo(nextPage);
-  })
-  .catch((error) => {
-    var errorCode = error.code;
-    var errorMessage = error.message;
-    accountError(errorCode, errorMessage);
-  })
+    .then((userCredential) => {
+      // Signed in
+      user = userCredential.user;
+      switchPageTo(nextPage);
+    })
+    .catch((error) => {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      accountError(errorCode, errorMessage);
+    })
 }
 
 function loginWithGoogle() {
@@ -75,25 +63,25 @@ function loginWithGoogle() {
 
 function signOut() {
   firebase.auth().signOut()
-  .then(()=> {
-    switchPageTo("index");
-  })
-  .catch((error) => {
-    var errorCode = error.code;
-    // errorMessage = error.message; if needed in future
-    accountError(errorCode);
-  })
+    .then(() => {
+      switchPageTo("index");
+    })
+    .catch((error) => {
+      var errorCode = error.code;
+      // errorMessage = error.message; if needed in future
+      accountError(errorCode);
+    })
 }
 
 function accountError(code) {
   switch (code) {
-    case "auth/invalid-email": 
+    case "auth/invalid-email":
       alert("Error: Invalid email.  Please try again or create a new account by going to the previous page.");
-    break;
+      break;
     case "auth/wrong-password":
       alert("Error: Incorrect password.");
-    break;
-    default: 
+      break;
+    default:
       alert("Whoops.  Unknown error.");
   }
 }
